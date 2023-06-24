@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="data/script.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<body>
+<center>
+<h1>Kantin Sekolah Simulator</h1>
+<h3>Annotation Sign Generator</h3>
+<div>
+    <label for="sizeInput">Size Text 1:</label>
+    <input type="number" id="sizeInput" class="form-control rounded-input" style="width: 100px;" value="200">
+</div>
+<div>
+    <label for="size2Input">Size Text 2:</label>
+    <input type="number" id="size2Input" class="form-control rounded-input" style="width: 100px;" value="200">
+</div>
+<div>
+    <label for="colorInput">Choose Text 1 Color:</label>
+    <input type="color" id="colorInput" value="#ff0000">
+</div>
+<div>
+    <label for="brTextInput">Choose Text 2 Color:</label>
+    <input type="color" id="brTextInput">
+</div>
+<div>
+    <label for="textInput">Text 1:</label>
+    <input type="text" id="textInput" class="form-control rounded-input" style="width: 300px;" placeholder="Ibu ayam">
+</div>
+<div>
+    <label for="text2Input">Text 2:</label>
+    <input type="text" id="text2Input" class="form-control rounded-input" style="width: 300px;" placeholder="Nerva 😋">
+</div>
+
+<div style="margin-top: 10px;">
+    <button onclick="generateAnnotation()">Generate Annotation</button>
+</div>
+
+<div class="annotation" id="annotationDiv"></div>
+<div>
+    <label for="shareLink">Share Link:</label>
+    <input type="text" id="shareLink" class="form-control rounded-input" style="width: 300px;" readonly>
+    <button onclick="copyShareLink()">Copy</button>
+</div>
+</center>
+
+<audio id="bgm1" src="bgm1.mp3" volume="0.3" loop></audio>
+<audio id="bgm2" src="bgm2.mp3" volume="0.3" loop></audio>
+
+<script>
+function generateAnnotation() {
+    const sizeInput = document.getElementById("sizeInput").value;
+    const size2Input = document.getElementById("size2Input").value;
+    const colorInput = document.getElementById("colorInput").value;
+    const textInput = document.getElementById("textInput").value || "";
+    const brTextInput = document.getElementById("brTextInput").value || "";
+    const text2Input = document.getElementById("text2Input").value || "";
+
+    const annotationText = `<span style="font-weight: bold; color: ${colorInput}; font-size: ${sizeInput}px">${textInput}</span>`;
+    const snippetText = `
+    <code class="snippet">
+        &lt;color=${colorInput}&gt;&lt;size=${sizeInput}&gt;${textInput}&lt;br&gt;&lt;color=${brTextInput}&gt;&lt;size=${size2Input}&gt;${text2Input}
+    </code>`;
+
+    document.getElementById("annotationDiv").innerHTML = snippetText;
+
+    const queryParams = new URLSearchParams({
+        sizeInput,
+        size2Input,
+        colorInput,
+        textInput,
+        brTextInput,
+        text2Input
+    });
+    const shareLink = `${window.location.origin}${window.location.pathname}?${queryParams.toString()}`;
+    document.getElementById("shareLink").value = shareLink;
+
+    // Play background music based on time of day
+    const currentTime = new Date();
+    const currentHour = currentTime.getHours();
+
+    if (currentHour >= 6 && currentHour < 18) {
+        playBGM("bgm1");
+    } else {
+        playBGM("bgm2");
+    }
+}
+
+function playBGM(bgmId) {
+    const bgm1 = document.getElementById("bgm1");
+    const bgm2 = document.getElementById("bgm2");
+
+    if (bgmId === "bgm1") {
+        bgm1.play();
+        bgm2.pause();
+    } else if (bgmId === "bgm2") {
+        bgm1.pause();
+        bgm2.play();
+    }
+}
+
+function copyShareLink() {
+    const shareLink = document.getElementById("shareLink");
+    shareLink.select();
+    document.execCommand("copy");
+}
+
+// Function to parse query parameters and populate the input fields
+function populateInputsFromQueryParams() {
+    const queryParams = new URLSearchParams(window.location.search);
+    document.getElementById("sizeInput").value = queryParams.get("sizeInput") || "200";
+    document.getElementById("size2Input").value = queryParams.get("size2Input") || "200";
+    document.getElementById("colorInput").value = queryParams.get("colorInput") || "#ff0000";
+    document.getElementById("textInput").value = queryParams.get("textInput") || "";
+    document.getElementById("brTextInput").value = queryParams.get("brTextInput") || "";
+    document.getElementById("text2Input").value = queryParams.get("text2Input") || "";
+}
+
+// Call the function to populate inputs on page load
+populateInputsFromQueryParams();
+</script>
+
+</body>
+</html>
